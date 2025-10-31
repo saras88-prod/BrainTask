@@ -1,9 +1,3 @@
-version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::EKS::Service
-      Properties:
-        ClusterName: my-eks-cluster        # your EKS cluster name
-        Namespace: default                 # namespace where app will run
-        Manifests:
-          - deployment.yaml                # path in the source repository
+echo "I am EKS"
+
+
