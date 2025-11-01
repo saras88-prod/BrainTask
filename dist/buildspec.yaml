@@ -7,11 +7,12 @@ phases:
     commands:
       - echo "Install AWS CLI and kubectl"
       - pip install awscli
-      - curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.29.0/2024-07-18/bin/linux/amd64/kubectl"
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+      - echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+      - sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
       - chmod +x kubectl
-      - mv kubectl /usr/local/bin/
-      - sudo chmod  777 *
-      - echo "kubectl version:"
+      - mkdir -p ~/.local/bin
+      - mv ./kubectl ~/.local/bin/kubectl
       - sudo kubectl version --client --short 
 
   build:
