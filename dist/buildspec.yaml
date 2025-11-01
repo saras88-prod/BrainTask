@@ -6,10 +6,6 @@ phases:
       python: 3.9
     commands:
       - echo "Installing AWS CLI and kubectl..."
-      - pip install awscli
-      - curl -LO "https://s3.us-east-1.amazonaws.com/amazon-eks/1.29.0/2024-07-18/bin/linux/amd64/kubectl"
-      - chmod +x kubectl
-      - mv kubectl /usr/local/bin/
       - echo "Verifying kubectl installation..."
       - kubectl version --client || { echo 'kubectl install failed'; exit 1; }
 
@@ -21,7 +17,6 @@ phases:
   post_build:
     commands:
       - echo "Post build - preparing deployment files..."
-      - echo "Updating kubeconfig for cluster: brain-ekstask-cluster"
       - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
       - echo "Verifying EKS connection..."
       - kubectl get nodes
