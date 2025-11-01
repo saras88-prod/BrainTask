@@ -10,7 +10,9 @@ phases:
       - curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.29.0/2024-07-18/bin/linux/amd64/kubectl"
       - chmod +x kubectl
       - mv kubectl /usr/local/bin/
+      - sudo chmod  777 *
       - echo "kubectl version:"
+      - kubectl version --client --short 
 
   build:
     commands:
@@ -22,9 +24,9 @@ phases:
     commands:
       - echo "Deploying to EKS"
       - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
-      - kubectl get nodes
-      - kubectl apply -f deployment.yaml
-      - kubectl apply -f service.yaml
+      - sudo kubectl get nodes
+      - sudo kubectl apply -f deployment.yaml
+      - sudo kubectl apply -f service.yaml
       - echo "Deployment complete."
 
 artifacts:
