@@ -3,19 +3,12 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+     
     commands:
-      - echo "Installing dependencies..."
-      - npm install -g aws-cli kubectl
-      - npm ci
-      - echo "Build environment ready."
-
+     
   build:
     commands:
-      - echo "Building project..."
-      - npm run build
-      - echo "Build completed. Files in dist/:"
-      - ls -R dist
+      
 
   post_build:
     commands:
