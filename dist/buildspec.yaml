@@ -5,29 +5,30 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
-      - echo "Installing AWS CLI and kubectl..."
-      - echo "Verifying kubectl installation..."
-      - kubectl version --client || { echo 'kubectl install failed'; exit 1; }
+      - echo "Install AWS CLI and kubectl"
+      - pip install awscli
+      - curl -LO "https://s3.us-west-2.amazonaws.com/amazon-eks/1.29.0/2024-07-18/bin/linux/amd64/kubectl"
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+      - echo "kubectl version:"
+      - kubectl version --client
 
   build:
     commands:
-      - echo "Build phase - skipping because app is prebuilt in dist folder."
-      - ls -R dist || echo "dist folder not found — ensure it's committed or built earlier."
+      - echo "Build phase (if needed) – adjust as appropriate"
+      # e.g., build Docker image, test, etc.
+      - ls -R .
 
   post_build:
     commands:
-      - echo "Post build - preparing deployment files..."
-      - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
-      - echo "Verifying EKS connection..."
-      - kubectl get nodes
-      - echo "Deploying to EKS..."
+      - echo "Deploying to EKS"
+      - aws eks update-kubeconfig --name your-eks-cluster-name --region your-region
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
-      - echo "EKS Deployment completed successfully."
+      - echo "Deployment complete."
 
 artifacts:
   files:
-    - dist/**/*
-    - dist/appspec.yaml
     - deployment.yaml
     - service.yaml
+    - # add any other files you want to include
