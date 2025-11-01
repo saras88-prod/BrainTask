@@ -3,12 +3,19 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-     
+      python: 3.9
     commands:
-     
+      - echo "Installing dependencies..."
+      - pip install awscli
+      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.27.0/2023-05-09/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl
+      - mv ./kubectl /usr/local/bin/
+      - echo "kubectl installed successfully."
+
   build:
     commands:
-      
+      - echo "Build phase - skipping because app is prebuilt in dist folder."
+      - ls -R dist
 
   post_build:
     commands:
@@ -18,11 +25,11 @@ phases:
       - echo "Deploying to EKS..."
       - kubectl apply -f dist/deployment.yaml
       - kubectl apply -f dist/service.yaml
-      - echo "EKS Deployment completed."
+      - echo "EKS Deployment completed successfully."
 
 artifacts:
   files:
     - dist/**/*
-    - appspec.yaml
-    - deployment.yaml
-    - service.yaml
+    - dist/appspec.yaml
+    - dist/deployment.yaml
+    - dist/service.yaml
