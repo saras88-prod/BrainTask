@@ -21,7 +21,7 @@ phases:
   post_build:
     commands:
       - echo "Deploying to EKS"
-      - aws eks update-kubeconfig --name your-eks-cluster-name --region your-region
+      - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
       - echo "Deployment complete."
