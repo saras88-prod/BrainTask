@@ -12,7 +12,7 @@ phases:
       - mv kubectl /usr/local/bin/
       - sudo chmod  777 *
       - echo "kubectl version:"
-      - kubectl version --client --short 
+      - sudo kubectl version --client --short 
 
   build:
     commands:
