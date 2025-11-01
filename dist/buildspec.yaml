@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Installing dependencies..."
+      - npm install -g aws-cli kubectl
+      - npm ci
+      - echo "Build environment ready."
+
+  build:
+    commands:
+      - echo "Building project..."
+      - npm run build
+      - echo "Build completed. Files in dist/:"
+      - ls -R dist
+
+  post_build:
+    commands:
+      - echo "Post build - preparing deployment files..."
+      - echo "Updating kubeconfig..."
+      - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
+      - echo "Deploying to EKS..."
+      - kubectl apply -f dist/deployment.yaml
+      - kubectl apply -f dist/service.yaml
+      - echo "EKS Deployment completed."
+
+artifacts:
+  files:
+    - dist/**/*
+    - appspec.yaml
+    - deployment.yaml
+    - service.yaml
