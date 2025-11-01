@@ -5,23 +5,26 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
-      - echo "Installing dependencies..."
+      - echo "Installing AWS CLI and kubectl..."
       - pip install awscli
-      - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.27.0/2023-05-09/bin/linux/amd64/kubectl
-      - chmod +x ./kubectl
-      - mv ./kubectl /usr/local/bin/
-      - echo "kubectl installed successfully."
+      - curl -LO "https://s3.us-east-1.amazonaws.com/amazon-eks/1.29.0/2024-07-18/bin/linux/amd64/kubectl"
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+      - echo "Verifying kubectl installation..."
+      - kubectl version --client || { echo 'kubectl install failed'; exit 1; }
 
   build:
     commands:
       - echo "Build phase - skipping because app is prebuilt in dist folder."
-      - ls -R dist
+      - ls -R dist || echo "dist folder not found — ensure it's committed or built earlier."
 
   post_build:
     commands:
       - echo "Post build - preparing deployment files..."
-      - echo "Updating kubeconfig..."
+      - echo "Updating kubeconfig for cluster: brain-ekstask-cluster"
       - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
+      - echo "Verifying EKS connection..."
+      - kubectl get nodes
       - echo "Deploying to EKS..."
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
