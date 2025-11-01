@@ -22,6 +22,7 @@ phases:
     commands:
       - echo "Deploying to EKS"
       - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
+      - kubectl get nodes
       - kubectl apply -f deployment.yaml
       - kubectl apply -f service.yaml
       - echo "Deployment complete."
