@@ -23,13 +23,13 @@ phases:
       - echo "Updating kubeconfig..."
       - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
       - echo "Deploying to EKS..."
-      - kubectl apply -f dist/deployment.yaml
-      - kubectl apply -f dist/service.yaml
+      - kubectl apply -f deployment.yaml
+      - kubectl apply -f service.yaml
       - echo "EKS Deployment completed successfully."
 
 artifacts:
   files:
     - dist/**/*
     - dist/appspec.yaml
-    - dist/deployment.yaml
-    - dist/service.yaml
+    - deployment.yaml
+    - service.yaml
