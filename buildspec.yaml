@@ -1,48 +1,30 @@
 version: 0.2
 
-env:
-  variables:
-    AWS_DEFAULT_REGION: us-east-1
-    AWS_ACCOUNT_ID: 118187397376
-    ECR_REPO_NAME: brain-tasks-app
-    CLUSTER_NAME: brain-ekstask-cluster
-    IMAGE_TAG: latest
-
 phases:
   install:
     runtime-versions:
       python: 3.9
     commands:
-      - echo "$AWS_DEFAULT_REGION , $AWS_ACCOUNT_ID , $ECR_REPO_NAME , $CLUSTER_NAME , $IMAGE_TAG"
       - echo "Installing AWS CLI and kubectl"
       - pip install awscli --upgrade
       - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
       - chmod +x kubectl
       - mv kubectl /usr/local/bin/
-      - echo "Installing Docker (if needed) and logging in to ECR"
-      - "$(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com)"
-
-  pre_build:
-    commands:
-      - echo "Build started on `date`"
-      - docker build -t $ECR_REPO_NAME:$IMAGE_TAG .
-      - docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+      - kubectl version --client
 
   build:
     commands:
-      - echo "Pushing Docker image to ECR"
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+      - echo "Skipping Docker build because image already exists in ECR"
 
   post_build:
     commands:
-      - echo "Updating image in deployment.yaml"
-      - sed -i "s|image:.*|image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG|" deployment.yaml
-      - echo "Updating kubeconfig for EKS cluster"
-      - aws eks update-kubeconfig --region $AWS_DEFAULT_REGION --name $CLUSTER_NAME
-      - echo "Deploying to EKS"
+      - echo "Updating kubeconfig"
+      - aws eks update-kubeconfig --name brain-ekstask-cluster --region us-east-1
+      - echo "Deploying to EKS with image"
       - kubectl apply -f deployment.yaml
-      - echo "Deployment to EKS complete"
-
+      - kubectl apply -f service.yaml
+      - echo "Deployment complete"
 artifacts:
   files:
     - deployment.yaml
+    - service.yaml
