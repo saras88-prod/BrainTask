@@ -13,22 +13,26 @@ phases:
     runtime-versions:
       python: 3.9
     commands:
+      - echo "$AWS_DEFAULT_REGION , $AWS_ACCOUNT_ID , $ECR_REPO_NAME , $CLUSTER_NAME , $IMAGE_TAG"
       - echo "Installing AWS CLI and kubectl"
       - pip install awscli --upgrade
       - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
       - chmod +x kubectl
       - mv kubectl /usr/local/bin/
       - echo "Installing Docker (if needed) and logging in to ECR"
-      - $(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com)
+      - "$(aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com)"
+
   pre_build:
     commands:
       - echo "Build started on `date`"
       - docker build -t $ECR_REPO_NAME:$IMAGE_TAG .
       - docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+
   build:
     commands:
       - echo "Pushing Docker image to ECR"
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
+
   post_build:
     commands:
       - echo "Updating image in deployment.yaml"
@@ -38,6 +42,7 @@ phases:
       - echo "Deploying to EKS"
       - kubectl apply -f deployment.yaml
       - echo "Deployment to EKS complete"
+
 artifacts:
   files:
     - deployment.yaml
