@@ -1,40 +1,36 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: myapp
-  namespace: default              # optional, good to specify
-  labels:
-    app: myapp
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: myapp
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-  template:
-    metadata:
-      labels:
-        app: myapp
-    spec:
-      containers:
-        - name: myapp
-          image: 118187397376.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 3000
-            initialDelaySeconds: 15
-            periodSeconds: 20
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "Install AWS CLI and kubectl"
+      - pip install awscli
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+      - ls -l
+      - chmod +x kubectl.sha256
+      - ls -l
+      - sudo apt-get update
+      - mkdir -p ~/.local/bin
+      - sudo kubectl version --client
+
+  build:
+    commands:
+      - echo "Build phase (if needed) – adjust as appropriate"
+      # e.g., build Docker image, test, etc.
+      - ls -R .
+
+  post_build:
+    commands:
+      - echo "Deploying to EKS"
+      - sudo kubectl get nodes
+      - sudo kubectl apply -f deployment.yaml
+      - sudo kubectl apply -f service.yaml
+      - echo "Deployment complete."
+
+artifacts:
+  files:
+    - deployment.yaml
+    - service.yaml
+    - # add any other files you want to include
