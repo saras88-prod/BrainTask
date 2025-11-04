@@ -6,12 +6,6 @@ files:
   - source: /
     destination: /tmp/app  # temporary folder where CodeDeploy copies your repo
 
-hooks:
-  BeforeInstall:
-    - location: scripts/pre_deploy.sh  # optional, e.g., for environment setup
-      timeout: 300
-      runas: root
-
   AfterInstall:
     - location: scripts/deploy.sh        # this will contain your kubectl commands
       timeout: 300
