@@ -1,15 +1,17 @@
 version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::EKS::Service
-      Properties:
-        TaskDefinition: ""
-        LoadBalancerInfo:
-          ContainerName: "brain-tasks-container"
-          ContainerPort: 80
+os: linux
+
+files:
+  - source: /
+    destination: /tmp/app  # temporary folder where CodeDeploy copies your repo
 
 hooks:
+  BeforeInstall:
+    - location: scripts/pre_deploy.sh  # optional, e.g., for environment setup
+      timeout: 300
+      runas: root
+
   AfterInstall:
-    - location: scripts/deploy.sh
-      timeout: 600
+    - location: scripts/deploy.sh        # this will contain your kubectl commands
+      timeout: 300
       runas: root
