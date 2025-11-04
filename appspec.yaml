@@ -4,9 +4,8 @@ os: linux
 
 files:
   - source: /
-    destination: /tmp/app  # temporary folder where CodeDeploy copies your repo
-
-  AfterInstall:
-    - location: scripts/deploy.sh        # this will contain your kubectl commands
+    destination: /tmp/app  # CodeDeploy copies your repository here
+ AfterInstall:
+    - location: scripts/deploy.sh       # Main deployment script (kubectl commands)
       timeout: 300
       runas: root
