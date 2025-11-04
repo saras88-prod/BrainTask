@@ -6,5 +6,5 @@ Resources:
         ClusterName: brain-tasks-clusters
         Namespace: default
         Manifest:
-          - k8s/deployment.yaml
-          - k8s/service.yaml
+          - scripts/deploy.sh
+         
