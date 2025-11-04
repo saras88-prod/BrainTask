@@ -1,11 +1,15 @@
 version: 0.0
-os: linux
-files:
-  - source: /
-    destination: /tmp/app
+Resources:
+  - TargetService:
+      Type: AWS::EKS::Service
+      Properties:
+        TaskDefinition: ""
+        LoadBalancerInfo:
+          ContainerName: "brain-tasks-container"
+          ContainerPort: 80
 
 hooks:
-  BeforeInstall:
+  AfterInstall:
     - location: scripts/deploy.sh
-      timeout: 300
+      timeout: 600
       runas: root
