@@ -1,22 +1,25 @@
 #!/bin/bash
 set -e
 
-# Set your namespace and EKS cluster
-NAMESPACE="dev"
-CLUSTER_NAME="brain-tasks-clusters"
+# Variables
 AWS_REGION="us-east-1"
-ECR_REPO="118187397376.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app"
-IMAGE_TAG="latest"
+CLUSTER_NAME="brain-tasks-clusters"
+ECR_REPO="118187397376.dkr.ecr.$AWS_REGION.amazonaws.com/brain-tasks-app:latest"
+NAMESPACE="default"
+DEPLOYMENT_NAME="brain-tasks-deployment"
+SERVICE_FILE="/tmp/app/k8s/service.yaml"
+DEPLOYMENT_FILE="/tmp/app/k8s/deployment.yaml"
 
-echo "Logging in to EKS cluster..."
-aws eks update-kubeconfig --region us-east-1 --name brain-tasks-clusters
+echo "Updating kubeconfig..."
+aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
-echo "Updating deployment image in Kubernetes..."
-kubectl set image deployment/brain-tasks-deployment \
-  brain-tasks-container=118187397376.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest \
-  -n dev
+echo "Applying Kubernetes deployment..."
+kubectl apply -f $DEPLOYMENT_FILE -n $NAMESPACE
+
+echo "Updating deployment image..."
+kubectl set image deployment/$DEPLOYMENT_NAME brain-tasks-container=$ECR_REPO -n $NAMESPACE
 
 echo "Applying service manifest..."
-kubectl apply -f /tmp/app/k8s/service.yaml -n dev
+kubectl apply -f $SERVICE_FILE -n $NAMESPACE
 
-echo "Deployment completed successfully."
+echo "Deployment completed successfully!"
