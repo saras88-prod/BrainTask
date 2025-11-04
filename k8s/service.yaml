@@ -1,12 +1,14 @@
-version: 0.0
-os: linux
-
-files:
-  - source: /
-    destination: /tmp/app  # CodeDeploy copies your repository files here
-
-hooks:
-  AfterInstall:
-    - location: scripts/deploy.sh  # This script will run your kubectl commands
-      timeout: 300                 # Max time in seconds for the deployment step
-      runas: root
+apiVersion: v1
+kind: Service
+metadata:
+  name: brain-tasks-service
+  labels:
+    app: brain-tasks-app
+spec:
+  selector:
+    app: brain-tasks-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
