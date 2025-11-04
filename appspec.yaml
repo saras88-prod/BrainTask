@@ -1,27 +1,11 @@
 version: 0.0
-Resources:
-  - ResourceName: brain-tasks-deployment
-    Type: AWS::EKS::KubernetesResource
-    Properties:
-      ClusterName: brain-tasks-clusters         # 🔹 Your EKS cluster name
-      Namespace: default                       # 🔹 Kubernetes namespace
-      ResourceType: deployment                 # 🔹 Type of K8s resource to update
-      ResourceName: brain-tasks-deployment     # 🔹 Must match metadata.name in deployment.yaml
-      # The image URI from ECR is automatically updated by CodeDeploy based on your buildspec output
-  - ResourceName: brain-tasks-service
-    Type: AWS::EKS::KubernetesResource
-    Properties:
-      ClusterName: brain-tasks-clusters
-      Namespace: default
-      ResourceType: service
-      ResourceName: brain-tasks-service
+os: linux
+files:
+  - source: /
+    destination: /tmp/app
 
-Hooks:
-  BeforeAllowTraffic:
-    - location: scripts/validate.sh
-      timeout: 300
-      runas: root
-  AfterAllowTraffic:
-    - location: scripts/verify.sh
+hooks:
+  BeforeInstall:
+    - location: scripts/deploy.sh
       timeout: 300
       runas: root
