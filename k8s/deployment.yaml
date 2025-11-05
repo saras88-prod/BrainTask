@@ -17,4 +17,4 @@ spec:
         - name: brain-tasks-container
           image: 118187397376.dkr.ecr.us-east-1.amazonaws.com/brain-tasks-app:latest  # 🔹 CodeDeploy updates this automatically
           ports:
-            - containerPort: 80
+            - containerPort: 3000
