@@ -1,15 +1,13 @@
 version: 0.0
 Resources:
   - TargetService:
-      Type: Kubernetes
+      Type: AWS::EKS::Service
       Properties:
-        # The name of your Kubernetes service that routes traffic
-        ServiceName: brain-tasks-service
-        # The file defining the Kubernetes resources (deployment, service, etc.)
-        # You can include multiple YAMLs here if needed.
-        ResourceDefinition:
-          Files:
-            - k8s/deployment.yaml
-            - k8s/service.yaml
-        # Optional: The namespace where the app is deployed
+        ClusterName: brain-tasks-clusters
         Namespace: default
+        # No specific name needed here; handled in deploy.sh
+Hooks:
+  BeforeInstall:
+    - location: scripts/deploy.sh
+      timeout: 3000
+      runas: root
