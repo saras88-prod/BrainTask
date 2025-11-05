@@ -9,5 +9,5 @@ Resources:
 Hooks:
   BeforeInstall:
     - location: scripts/deploy.sh
-      timeout: 3000
+      timeout: 300
       runas: root
